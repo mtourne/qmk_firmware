@@ -22,6 +22,10 @@ deploy:
 
 **Option .. future**
 
+    * use cluster TYGH - between arrow and mouse keys
+    * for something more useful than pgup pgdown / mouse wheel up down
+      * H backspace ?
+
     * (TODO) left of "vi-htns" have move left by a word,
     * (TODO) backspace -> del
     * (TODO) ` -> ESC
