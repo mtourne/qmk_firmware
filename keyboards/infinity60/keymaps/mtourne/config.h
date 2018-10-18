@@ -3,12 +3,19 @@
 
 #include "../../config.h"
 
+// I have the MD1 (for massdrop 1?)
+// there are no leds
+#undef INFINITY_LED
+
 #undef MANUFACTURER
 #undef PRODUCT
 #undef DESCRIPTION
 #define MANUFACTURER    QMK
-#define PRODUCT         HHKB QMK mtourne
-#define DESCRIPTION     HHKB on QMK Firmware with mtourne keymap
+#define PRODUCT         InfinityMD1 QMK mtourne
+#define DESCRIPTION     InfinityMD1 on QMK Firmware with mtourne keymap
+
+// XX (mtourne): this should probably be in a global config
+// included accross keyboards.
 
 // Increase "Tap" detection window.
 // this what governs LT() macro and spacebar tap
