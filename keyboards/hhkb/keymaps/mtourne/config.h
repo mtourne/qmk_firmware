@@ -34,8 +34,13 @@
 // How long (ms) to reach max speed
 #define MOUSEKEY_TIME_TO_MAX    20
 
-// same settings for wheel
-#define MOUSEKEY_WHEEL_TIME_TO_MAX  20
-#define MOUSEKEY_WHEEL_MAX_SPEED    6
+// wheel settings
+#define MOUSEKEY_WHEEL_TIME_TO_MAX  255
+#define MOUSEKEY_WHEEL_MAX_SPEED    1
+
+// I want ctrl and alt from the util layer to stick
+// but ideally I'll have an easy way to reset them
+#define ONESHOT_TAP_TOGGLE 2  /* Tapping this number of times holds the key until tapped once again. */
+#define ONESHOT_TIMEOUT 10000
 
 #endif
