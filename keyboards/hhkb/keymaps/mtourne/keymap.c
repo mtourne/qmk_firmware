@@ -30,10 +30,7 @@
  *
  */
 
-
-enum custom_keycodes {
-  KC_CANCEL_OSM = SAFE_RANGE
-};
+enum custom_keycodes { KC_CANCEL_OSM = SAFE_RANGE };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -57,8 +54,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS, KC_EQL, KC_BSLS, KC_ESC,
         KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_LBRC, KC_RBRC, KC_BSPC,
         OSM(MOD_LCTL), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
-        KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), KC_RSFT, MO(HHKB),
-        OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), KC_RGUI, KC_RALT),
+        OSM(MOD_LSFT), KC_Z, KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), OSM(MOD_LSFT), MO(HHKB),
+        OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), OSM(MOD_LGUI), OSM(MOD_LCTL)
+    ),
 
 
     // XX (mt) : I would probably need a tap dance for desired
@@ -92,6 +90,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
     /* DVOR Layer: Dvorak
+    // TODO dvorak layer has really been abandonned this days since I use dvorak software from the os
+    // need to backport all the features of qwer and make it work in UTIL layer as well (c-x for eg)
      *
      * ,--------------------------------------------------------------.
      * |`  |    1 |  2|  3|  4|  5|  6|  7|  8|  9|  0|  [|  ]|  \|Esc|
@@ -245,8 +245,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool cancel_all_oneshots(void) {
   bool queue = true;
 
-  uprintf("before: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n",
-          get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
+  uprintf("before: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n", get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
 
   if (get_oneshot_mods() && !has_oneshot_mods_timed_out()) {
     clear_oneshot_mods();
@@ -260,9 +259,7 @@ bool cancel_all_oneshots(void) {
     queue = false;
   }
 
-  uprintf("after: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n",
-          get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
-
+  uprintf("after: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n", get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
 
   return queue;
 }
@@ -271,20 +268,19 @@ bool cancel_all_oneshots(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   bool queue = true;
 
-  //Cancel one-shot mods.
+  // Cancel one-shot mods.
   switch (keycode) {
+    case KC_ESC:
+      if (record->event.pressed) {
+        queue = cancel_all_oneshots();
+      }
+      break;
 
-  case KC_ESC:
-    if (record->event.pressed) {
-      queue = cancel_all_oneshots();
-    }
-    break;
-
-  case KC_CANCEL_OSM:
-    if (record->event.pressed) {
-      queue = cancel_all_oneshots();
-    }
-    break;
+    case KC_CANCEL_OSM:
+      if (record->event.pressed) {
+        queue = cancel_all_oneshots();
+      }
+      break;
   }
 
   return queue;
@@ -292,24 +288,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 uint32_t layer_state_set_user(uint32_t state) {
   switch (biton32(state)) {
+    case LLCTL:
+      uprint("lctl dummy layer\n");
+      set_oneshot_mods(MOD_LCTL);
+      break;
 
-  case LLCTL:
-    uprint("lctl dummy layer\n");
-    set_oneshot_mods(MOD_LCTL);
-    break;
+    case LLALT:
+      uprint("lalt dummy layer\n");
+      set_oneshot_mods(MOD_LALT);
+      break;
 
-  case LLALT:
-    uprint("lalt dummy layer\n");
-    set_oneshot_mods(MOD_LALT);
-    break;
+    case LLGUI:
+      uprint("lgui dummy layer\n");
+      set_oneshot_mods(MOD_LGUI);
+      break;
 
-  case LLGUI:
-    uprint("lgui dummy layer\n");
-    set_oneshot_mods(MOD_LGUI);
-    break;
-
-  default:
-    break;
+    default:
+      break;
   }
 
   return state;
