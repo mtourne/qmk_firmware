@@ -39,14 +39,18 @@
 
 //Tap Dance Declarations
 enum {
-  TD_LSFT_CAPS = 0
+  TD_LSFT_CAPS = 0,
+  TD_M_CTL
 };
 
 // caps lock stuff
 static bool caps_lock = false;
 #define DEBOUNCE_CAPS_DELAY 100
 
-enum custom_keycodes { KC_CANCEL_OSM = SAFE_RANGE };
+enum custom_keycodes {
+  KC_CANCEL_OSM = SAFE_RANGE,
+  KC_SPC_LOCK
+};
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -73,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         OSM(MOD_LCTL), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
         /* unbearable causes other mods to stick : OSM(MOD_LSFT),*/
         TD(TD_LSFT_CAPS)
-        /*KC_LSFT*/, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), TD(TD_LSFT_CAPS), MO(HHKB),
+        /*KC_LSFT*/, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), /*TD(TD_M_CTL),*/ LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), TD(TD_LSFT_CAPS), MO(HHKB),
         OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), OSM(MOD_LGUI), OSM(MOD_LCTL)
     ),
 
@@ -81,6 +85,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // XX (mt) : I would probably need a tap dance for desired
     // (works) short press : M
     // (works) long press -> OSM ctl
+    // (missing) hold -> holds control
     // (missing) tap twice -> hold ctl
     [LLCTL] = LAYOUT(
        //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
@@ -391,7 +396,7 @@ typedef enum {
 static td_state_t td_state_sft;
 
 // determine the tapdance state to return
-int cur_dance (qk_tap_dance_state_t *state) {
+int cur_dance(qk_tap_dance_state_t *state) {
   if (state->count == 1) {
     if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
     else { return SINGLE_HOLD; }
@@ -402,39 +407,57 @@ int cur_dance (qk_tap_dance_state_t *state) {
 
 // handle the possible states for each tapdance keycode you define:
 
-void sft_finished (qk_tap_dance_state_t *state, void *user_data) {
+void sft_finished(qk_tap_dance_state_t *state, void *user_data) {
   td_state_sft = cur_dance(state);
   if (td_state_sft == DOUBLE_SINGLE_TAP) {
-    if (!caps_lock) {
       register_code(KC_CAPSLOCK);
       return;
-    }
   }
 
-  if (caps_lock) {
-    register_code(KC_CAPSLOCK);
-  } else {
-    register_code(KC_LSFT);
-  }
+  register_code(KC_LSFT);
 }
 
-void sft_reset (qk_tap_dance_state_t *state, void *user_data) {
-    if (td_state_sft == DOUBLE_SINGLE_TAP) {
-      if (!caps_lock) {
-        caps_lock = true;
-        wait_ms(DEBOUNCE_CAPS_DELAY);
-        unregister_code(KC_CAPSLOCK);
-        return;
-      }
-    }
+void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
+  if (td_state_sft == DOUBLE_SINGLE_TAP) {
+    caps_lock = !caps_lock;
+    wait_ms(DEBOUNCE_CAPS_DELAY);
+    unregister_code(KC_CAPSLOCK);
+    return;
+  }
 
-    if (caps_lock) {
-      caps_lock = false;
-      wait_ms(DEBOUNCE_CAPS_DELAY);
-      unregister_code(KC_CAPSLOCK);
-    } else {
-      unregister_code(KC_LSFT);
+  unregister_code(KC_LSFT);
+}
+
+static td_state_t td_state_Mctl;
+
+void mctl_finished(qk_tap_dance_state_t *state, void *user_data) {
+    td_state_Mctl = cur_dance(state);
+    switch (td_state_Mctl) {
+    case SINGLE_TAP:
+      // this is for qwerty
+      register_code(KC_M);
+      break;
+    case SINGLE_HOLD:
+      set_oneshot_mods(MOD_LCTL);
+      break;
+    case DOUBLE_SINGLE_TAP:
+      set_oneshot_locked_mods(MOD_LCTL);
+      break;
+    default:
+      // nothing
+      break;
     }
+}
+
+void mctl_reset(qk_tap_dance_state_t *state, void *user_data) {
+  switch (td_state_Mctl) {
+  case SINGLE_TAP:
+    unregister_code(KC_M);
+    break;
+  default:
+    // nothing
+    break;
+  }
 }
 
 
@@ -442,7 +465,8 @@ void sft_reset (qk_tap_dance_state_t *state, void *user_data) {
 qk_tap_dance_action_t tap_dance_actions[] = {
   //Tap once for Shift, twice for Caps Lock
   // try to do same as tap dance double but with print
-  [TD_LSFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset)
+  [TD_LSFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset),
+  [TD_M_CTL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mctl_finished, mctl_reset)
 };
 
 
