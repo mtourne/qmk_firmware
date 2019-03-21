@@ -17,9 +17,11 @@
 #define LLCTL 9
 #define LLALT 10
 #define LLGUI 11
+#define MOUSE 12
 
 // Easier-to-read Layer Arrays.
 #define ____ KC_TRNS
+#define xxxx KC_NO
 
 /* Notes
  *
@@ -31,6 +33,7 @@
  */
 
 enum custom_keycodes { KC_CANCEL_OSM = SAFE_RANGE };
+
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -54,7 +57,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS, KC_EQL, KC_BSLS, KC_ESC,
         KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_LBRC, KC_RBRC, KC_BSPC,
         OSM(MOD_LCTL), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
-        OSM(MOD_LSFT), KC_Z, KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), OSM(MOD_LSFT), MO(HHKB),
+        OSM(MOD_LSFT), LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), OSM(MOD_LSFT), MO(HHKB),
         OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), OSM(MOD_LGUI), OSM(MOD_LCTL)
     ),
 
@@ -157,6 +160,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     // OLD UTIL: has mouse direction under the left hand
     //  I've decided to put the mouse key on Z + ijkl. see above.
+    //  2019-03-20: adding mouse layer ^^^
+
+
+    [ MOUSE ] = LAYOUT(
+       //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx,
+         // wheel up down are inverted for mac os.
+         // TODO in "pc" config they should reverse
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_D, KC_BTN1, KC_MS_U, KC_BTN2, xxxx, xxxx, xxxx, xxxx,
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_U, KC_MS_L, KC_MS_D, KC_MS_R, xxxx, xxxx, xxxx,
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx,
+         xxxx, xxxx, xxxx, xxxx, xxxx),
+
 
     //[UTIL] = LAYOUT(
     //    KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, ____, ____,
@@ -182,7 +198,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // + one-shot to activate shifted numbers (symb)
     [UTIL] = LAYOUT(
        //  1     2      3      4       5.      6     7     8.     9      10      11      12     13    14    15
-        KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F1, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, ____, ____,
+        KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, ____, ____,
         ____, ____, ____, KC_UNDERSCORE, KC_PLUS, KC_BSLS, KC_PGUP, KC_BSPC, KC_UP, KC_DEL, ____, ____, ____, ____,
         ____, ____, ____, KC_LEFT_PAREN, KC_RIGHT_PAREN, KC_RBRACKET, KC_PGDN, KC_LEFT, KC_DOWN, KC_RIGHT, KC_CANCEL_OSM, ____, ____,
         ____, ____, ____, KC_MINUS, KC_EQUAL, LCTL(KC_B) /* x software dvorak */, OSM(MOD_LALT), OSM(MOD_LCTL), OSM(MOD_LGUI), OSL(SYMB), OSL(NUM), ____, ____,
@@ -278,7 +294,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     case KC_CANCEL_OSM:
       if (record->event.pressed) {
-        queue = cancel_all_oneshots();
+        // clear everything
+        clear_oneshot_mods();
+        clear_oneshot_locked_mods();
+        unregister_mods(get_mods());
+        queue = false;
       }
       break;
   }
