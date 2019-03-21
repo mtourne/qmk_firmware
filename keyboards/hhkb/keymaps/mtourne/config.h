@@ -41,6 +41,7 @@
 // I want ctrl and alt from the util layer to stick
 // but ideally I'll have an easy way to reset them
 #define ONESHOT_TAP_TOGGLE 2  /* Tapping this number of times holds the key until tapped once again. */
-#define ONESHOT_TIMEOUT 10000
+// 4.5 secs.
+#define ONESHOT_TIMEOUT 4500
 
 #endif
