@@ -44,4 +44,9 @@
 // 4.5 secs.
 #define ONESHOT_TIMEOUT 4500
 
+// this might help with holding down ctl on the LLCTL layer?
+// a: it does hit the next key held but doesnt come back up to default layer
+// #define STRICT_LAYER_RELEASE
+
+
 #endif

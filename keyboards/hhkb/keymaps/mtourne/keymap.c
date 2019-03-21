@@ -49,9 +49,22 @@ static bool caps_lock = false;
 
 enum custom_keycodes {
   KC_CANCEL_OSM = SAFE_RANGE,
+  KC_TEST,
   KC_SPC_LOCK
 };
 
+// 2019-03-21
+// llctl is a dummy layer where everything is control'd
+// in practice, I'm not sure it's terribly useful
+// #define LLCTL_ON
+// #define LLCTL_HOLD_OSL
+
+#ifdef LLCTL_ON
+#define M_CTL LT(LLCTL, KC_M)
+static bool llctl_used = false;
+#else
+#define M_CTL KC_M
+#endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -77,43 +90,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         OSM(MOD_LCTL), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
         /* unbearable causes other mods to stick : OSM(MOD_LSFT),*/
         TD(TD_LSFT_CAPS)
-        /*KC_LSFT*/, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), /*TD(TD_M_CTL),*/ LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), TD(TD_LSFT_CAPS), MO(HHKB),
+        /*KC_LSFT*/, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, KC_N, M_CTL, KC_COMM, LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), TD(TD_LSFT_CAPS), MO(HHKB),
         OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), OSM(MOD_LGUI), OSM(MOD_LCTL)
     ),
 
 
-    // XX (mt) : I would probably need a tap dance for desired
+    // 2019-03-21 : is this that useful?
+    // ctl layer
     // (works) short press : M
     // (works) long press -> OSM ctl
-    // (missing) hold -> holds control
+    // (works) hold -> holds control
     // (missing) tap twice -> hold ctl
+
     [LLCTL] = LAYOUT(
        //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
          ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
          ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
          ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
          ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____),
+         ____, ____, MO(UTIL), ____, ____),
 
 
-   [LLALT] = LAYOUT(
-          //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____),
-
-    [LLGUI] = LAYOUT(
-          //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____,
-         ____, ____, ____, ____, ____),
-
-
-    /* DVOR Layer: Dvorak
+     /* DVOR Layer: Dvorak
     // TODO dvorak layer has really been abandonned this days since I use dvorak software from the os
     // need to backport all the features of qwer and make it work in UTIL layer as well (c-x for eg)
      *
@@ -205,14 +203,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          xxxx, xxxx, TG(MOUSELOCK), xxxx, xxxx),
 
 
-    //[UTIL] = LAYOUT(
-    //    KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, ____, ____,
-    //    ____, ____, KC_BTN1, KC_MS_U, KC_BTN2, KC_WH_U, KC_PGUP, LCTL(KC_LEFT), KC_UP, LCTL(KC_RIGHT), ____, ____, ____, ____,
-    //    ____, ____, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D, KC_PGDN, KC_LEFT, KC_DOWN, KC_RIGHT, ____, ____, ____,
-    //    ____, ____, ____, ____, ____, KC_SPC, KC_BSPC, KC_DEL, ____, ____, ____, ____, ____,
-    //    ____, ____, ____, ____, ____),
-
-
     // Naked util with just nav cluster
     // [UTIL] = LAYOUT(
     //    //  1     2      3      4       5.      6     7     8.     9      10      11      12     13    14    15
@@ -234,15 +224,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ____, ____, ____, KC_LEFT_PAREN, KC_RIGHT_PAREN, KC_RBRACKET, KC_PGDN, KC_LEFT, KC_DOWN, KC_RIGHT, KC_CANCEL_OSM, ____, ____,
         ____, ____, ____, KC_MINUS, KC_EQUAL, LCTL(KC_B) /* x software dvorak */, OSM(MOD_LALT), OSM(MOD_LCTL), OSM(MOD_LGUI), OSL(SYMB), OSL(NUM), ____, ____,
         ____, ____, ____, ____, ____),
-
-    // Util with number as base
-    // [UTIL] = LAYOUT(
-    //    //  1     2      3      4       5.      6     7     8.     9      10      11      12     13    14    15
-    //     KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, ____, ____,
-    //     ____, ____, KC_7, KC_8, KC_9, ____, KC_PGUP, ____, KC_UP, MO(UTILPLUS), ____, ____, ____, ____,
-    //     ____, KC_0, KC_4, KC_5, KC_6, ____, KC_PGDN, KC_LEFT, KC_DOWN, KC_RIGHT, KC_RSFT, ____, ____,
-    //     ____, ____, KC_1, KC_2, KC_3, KC_SPC, KC_BSPC, KC_DEL, ____, ____, ____, ____, ____,
-    //     ____, ____, ____, ____, ____),
 
 
     [NUM] = LAYOUT(
@@ -322,6 +303,7 @@ bool cancel_all_oneshots(void) {
   return queue;
 }
 
+
 // Custom keycodes
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   bool queue = true;
@@ -335,11 +317,43 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
      dprintf("KEY RELEASED: %d\n\toneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n",
              keycode,
              get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
-
   }
+
+
+#ifdef LLCTL_ON
+  if (layer_state_is(LLCTL)) {
+    if (keycode != M_CTL) {
+      dprintf("layer LLCTL active, keycode received: %d, keycode activating layer: %d\n",
+              keycode, M_CTL);
+      if (record->event.pressed) {
+        llctl_used = true;
+        register_code(KC_LCTL);
+        register_code(keycode);
+      } else {
+        unregister_code(keycode);
+        unregister_code(KC_LCTL);
+      }
+      return false;
+    }
+#ifdef LLCTL_HOLD_OSL
+    else {
+      if (!record->event.pressed && !llctl_used) {
+        llctl_used = true;
+        dprintf("layer LLCTL active, received M_CTL. setting oneshot(CTL)\n");
+        set_oneshot_mods(MOD_LCTL);
+      }
+    }
+#endif
+  }
+#endif
 
   // Cancel one-shot mods.
   switch (keycode) {
+
+    case KC_TEST:
+      queue = false;
+      dprint("GOT TEST KEY\n");
+      break;
 
     case KC_ESC:
       if (record->event.pressed) {
@@ -360,20 +374,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 uint32_t layer_state_set_user(uint32_t state) {
   switch (biton32(state)) {
+#ifdef LLCTL_ON
     case LLCTL:
       uprint("lctl dummy layer\n");
-      set_oneshot_mods(MOD_LCTL);
+      llctl_used = false;
       break;
-
-    case LLALT:
-      uprint("lalt dummy layer\n");
-      set_oneshot_mods(MOD_LALT);
-      break;
-
-    case LLGUI:
-      uprint("lgui dummy layer\n");
-      set_oneshot_mods(MOD_LGUI);
-      break;
+#endif
 
     default:
       break;
@@ -428,45 +434,11 @@ void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
   unregister_code(KC_LSFT);
 }
 
-static td_state_t td_state_Mctl;
-
-void mctl_finished(qk_tap_dance_state_t *state, void *user_data) {
-    td_state_Mctl = cur_dance(state);
-    switch (td_state_Mctl) {
-    case SINGLE_TAP:
-      // this is for qwerty
-      register_code(KC_M);
-      break;
-    case SINGLE_HOLD:
-      set_oneshot_mods(MOD_LCTL);
-      break;
-    case DOUBLE_SINGLE_TAP:
-      set_oneshot_locked_mods(MOD_LCTL);
-      break;
-    default:
-      // nothing
-      break;
-    }
-}
-
-void mctl_reset(qk_tap_dance_state_t *state, void *user_data) {
-  switch (td_state_Mctl) {
-  case SINGLE_TAP:
-    unregister_code(KC_M);
-    break;
-  default:
-    // nothing
-    break;
-  }
-}
-
-
 //Tap Dance Definitions
 qk_tap_dance_action_t tap_dance_actions[] = {
   //Tap once for Shift, twice for Caps Lock
   // try to do same as tap dance double but with print
   [TD_LSFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset),
-  [TD_M_CTL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mctl_finished, mctl_reset)
 };
 
 
