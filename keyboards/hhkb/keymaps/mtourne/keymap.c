@@ -306,11 +306,11 @@ bool cancel_all_oneshots(void) {
 
   // XX should esc release caps lock too?
   if (caps_lock) {
+    caps_lock = false;
     dprint("caps lock off\n");
     register_code(KC_CAPSLOCK);
     wait_ms(DEBOUNCE_CAPS_DELAY);
     unregister_code(KC_CAPSLOCK);
-    caps_lock = false;
     queue = false;
   }
 
@@ -404,44 +404,37 @@ int cur_dance (qk_tap_dance_state_t *state) {
 
 void sft_finished (qk_tap_dance_state_t *state, void *user_data) {
   td_state_sft = cur_dance(state);
-  switch (td_state_sft) {
-  case DOUBLE_SINGLE_TAP:
-    dprint("double single tap: caps lock ON\n");
-    register_code(KC_CAPSLOCK);
-    break;
-  default:
-    if (caps_lock) {
-      dprint("caps lock OFF\n");
+  if (td_state_sft == DOUBLE_SINGLE_TAP) {
+    if (!caps_lock) {
       register_code(KC_CAPSLOCK);
-    } else {
-      // register a normal shift
-      register_code(KC_LSFT);
+      return;
     }
-    break;
+  }
+
+  if (caps_lock) {
+    register_code(KC_CAPSLOCK);
+  } else {
+    register_code(KC_LSFT);
   }
 }
 
 void sft_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (td_state_sft) {
-  case DOUBLE_SINGLE_TAP:
-    caps_lock = true;
-    dprint("wait\n");
-    wait_ms(DEBOUNCE_CAPS_DELAY);
-    dprint("wait done\n");
-    unregister_code(KC_CAPSLOCK);
-    break;
-  default:
+    if (td_state_sft == DOUBLE_SINGLE_TAP) {
+      if (!caps_lock) {
+        caps_lock = true;
+        wait_ms(DEBOUNCE_CAPS_DELAY);
+        unregister_code(KC_CAPSLOCK);
+        return;
+      }
+    }
+
     if (caps_lock) {
-      dprint("wait\n");
-      wait_ms(DEBOUNCE_CAPS_DELAY);
-      dprint("wait done\n");
-      unregister_code(KC_CAPSLOCK);
       caps_lock = false;
+      wait_ms(DEBOUNCE_CAPS_DELAY);
+      unregister_code(KC_CAPSLOCK);
     } else {
       unregister_code(KC_LSFT);
     }
-    break;
-  }
 }
 
 
