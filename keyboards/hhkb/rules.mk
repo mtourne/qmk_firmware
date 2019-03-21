@@ -102,6 +102,8 @@ VPATH += $(RN42_DIR)
 endif
 
 
+# OPT_DEFS += -DDEBUG_ACTION
+
 # debug-on: EXTRAFLAGS += -DDEBUG -DDEBUG_ACTION
 # debug-on: all
 
@@ -109,4 +111,4 @@ endif
 # debug-off: OPT_DEFS := $(filter-out -DCONSOLE_ENABLE,$(OPT_DEFS))
 # debug-off: all
 
-# TAP_DANCE_ENABLE = yes
+TAP_DANCE_ENABLE = yes

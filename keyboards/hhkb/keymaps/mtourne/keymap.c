@@ -18,6 +18,7 @@
 #define LLALT 10
 #define LLGUI 11
 #define MOUSE 12
+#define MOUSELOCK 13
 
 // Easier-to-read Layer Arrays.
 #define ____ KC_TRNS
@@ -27,10 +28,23 @@
  *
  * 2019-02-14 :
  *  major modification to util layer in preparation for a 40%
- *   all lower hand row set up for layers
- *   I wish I could use LT(<layer>, key) and then space to OLS
- *
+ *   all lower hand row will do layers
+ *  Currently space will lock a layer with symb && symblock
+ * 2019-03-20:
+ *  what I want for the layer keys is a better one shot
+ *  tap once -> letter
+ *  hold 200+ms -> one shot on layer (if nothing was entered)
+ +  double tap -> lock layer (retap to unlock)
  */
+
+//Tap Dance Declarations
+enum {
+  TD_LSFT_CAPS = 0
+};
+
+// caps lock stuff
+static bool caps_lock = false;
+#define DEBOUNCE_CAPS_DELAY 100
 
 enum custom_keycodes { KC_CANCEL_OSM = SAFE_RANGE };
 
@@ -58,7 +72,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_LBRC, KC_RBRC, KC_BSPC,
         OSM(MOD_LCTL), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
         /* unbearable causes other mods to stick : OSM(MOD_LSFT),*/
-        KC_LSFT, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), KC_RSFT, MO(HHKB),
+        TD(TD_LSFT_CAPS)
+        /*KC_LSFT*/, LT(MOUSE, KC_Z), KC_X, KC_C, KC_V, KC_B, LT(LLALT, KC_N), LT(LLCTL, KC_M), LT(LLGUI, KC_COMM), LT(SYMB, KC_DOT), LT(NUM, KC_SLSH), TD(TD_LSFT_CAPS), MO(HHKB),
         OSM(MOD_LALT), OSM(MOD_LGUI), LT(UTIL, KC_SPC), OSM(MOD_LGUI), OSM(MOD_LCTL)
     ),
 
@@ -172,7 +187,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_D, KC_BTN1, KC_MS_U, KC_BTN2, xxxx, xxxx, xxxx, xxxx,
          xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_U, KC_MS_L, KC_MS_D, KC_MS_R, xxxx, xxxx, xxxx,
          xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx,
-         xxxx, xxxx, xxxx, xxxx, xxxx),
+         xxxx, xxxx, TG(MOUSELOCK), xxxx, xxxx),
+
+    [ MOUSELOCK ] = LAYOUT(
+       //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx,
+         // wheel up down are inverted for mac os.
+         // TODO in "pc" config they should reverse
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_D, KC_BTN1, KC_MS_U, KC_BTN2, xxxx, xxxx, xxxx, xxxx,
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, KC_WH_U, KC_MS_L, KC_MS_D, KC_MS_R, xxxx, xxxx, xxxx,
+         xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx, xxxx,
+         xxxx, xxxx, TG(MOUSELOCK), xxxx, xxxx),
 
 
     //[UTIL] = LAYOUT(
@@ -257,7 +282,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* //     ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, */
     /* //     ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, */
     /* //     ____, ____, ____, ____, ____), */
-};
+         };
+
 
 bool cancel_all_oneshots(void) {
   bool queue = true;
@@ -278,6 +304,16 @@ bool cancel_all_oneshots(void) {
 
   uprintf("after: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n", get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
 
+  // XX should esc release caps lock too?
+  if (caps_lock) {
+    dprint("caps lock off\n");
+    register_code(KC_CAPSLOCK);
+    wait_ms(DEBOUNCE_CAPS_DELAY);
+    unregister_code(KC_CAPSLOCK);
+    caps_lock = false;
+    queue = false;
+  }
+
   return queue;
 }
 
@@ -285,21 +321,31 @@ bool cancel_all_oneshots(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   bool queue = true;
 
+  if (record->event.pressed) {
+       dprintf("KEY PRESSED: %d\n\toneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n",
+             keycode,
+             get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
+
+  } else {
+     dprintf("KEY RELEASED: %d\n\toneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n",
+             keycode,
+             get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
+
+  }
+
   // Cancel one-shot mods.
   switch (keycode) {
+
     case KC_ESC:
       if (record->event.pressed) {
+        dprint("ESC pressed\n");
         queue = cancel_all_oneshots();
       }
       break;
 
     case KC_CANCEL_OSM:
       if (record->event.pressed) {
-        // clear everything
-        clear_oneshot_mods();
-        clear_oneshot_locked_mods();
-        unregister_mods(get_mods());
-        queue = false;
+        queue = cancel_all_oneshots();
       }
       break;
   }
@@ -329,4 +375,88 @@ uint32_t layer_state_set_user(uint32_t state) {
   }
 
   return state;
+}
+
+// adapted from
+// https://beta.docs.qmk.fm/features/feature_tap_dance#example-5-using-tap-dance-for-advanced-mod-tap-and-layer-tap-keys
+
+// define a type containing as many tapdance states as you need
+typedef enum {
+  SINGLE_TAP,
+  SINGLE_HOLD,
+  DOUBLE_SINGLE_TAP
+} td_state_t;
+
+// create a global instance of the tapdance state type
+static td_state_t td_state_sft;
+
+// determine the tapdance state to return
+int cur_dance (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
+    else { return SINGLE_HOLD; }
+  }
+  if (state->count == 2) { return DOUBLE_SINGLE_TAP; }
+  else { return 3; } // any number higher than the maximum state value you return above
+}
+
+// handle the possible states for each tapdance keycode you define:
+
+void sft_finished (qk_tap_dance_state_t *state, void *user_data) {
+  td_state_sft = cur_dance(state);
+  switch (td_state_sft) {
+  case DOUBLE_SINGLE_TAP:
+    dprint("double single tap: caps lock ON\n");
+    register_code(KC_CAPSLOCK);
+    break;
+  default:
+    if (caps_lock) {
+      dprint("caps lock OFF\n");
+      register_code(KC_CAPSLOCK);
+    } else {
+      // register a normal shift
+      register_code(KC_LSFT);
+    }
+    break;
+  }
+}
+
+void sft_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (td_state_sft) {
+  case DOUBLE_SINGLE_TAP:
+    caps_lock = true;
+    dprint("wait\n");
+    wait_ms(DEBOUNCE_CAPS_DELAY);
+    dprint("wait done\n");
+    unregister_code(KC_CAPSLOCK);
+    break;
+  default:
+    if (caps_lock) {
+      dprint("wait\n");
+      wait_ms(DEBOUNCE_CAPS_DELAY);
+      dprint("wait done\n");
+      unregister_code(KC_CAPSLOCK);
+      caps_lock = false;
+    } else {
+      unregister_code(KC_LSFT);
+    }
+    break;
+  }
+}
+
+
+//Tap Dance Definitions
+qk_tap_dance_action_t tap_dance_actions[] = {
+  //Tap once for Shift, twice for Caps Lock
+  // try to do same as tap dance double but with print
+  [TD_LSFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset)
+};
+
+
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  //odebug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
 }
