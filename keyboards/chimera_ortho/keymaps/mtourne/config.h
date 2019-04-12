@@ -12,7 +12,7 @@
 // this what governs LT() macro and spacebar tap
 // XX: maybe 250?
 #undef TAPPING_TERM
-#define TAPPING_TERM 300
+#define TAPPING_TERM 270
 
 // if sending space+key within the tapping term it should register correctly.
 #define PERMISSIVE_HOLD
@@ -43,7 +43,7 @@
 #define ONESHOT_TAP_TOGGLE 2  /* Tapping this number of times holds the key until tapped once again. */
 // 4.5 secs.
 #undef ONESHOT_TIMEOUT
-#define ONESHOT_TIMEOUT 4500
+#define ONESHOT_TIMEOUT 3000
 
 // this might help with holding down ctl on the LLCTL layer?
 // a: it does hit the next key held but doesnt come back up to default layer
