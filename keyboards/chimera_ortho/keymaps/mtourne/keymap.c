@@ -128,6 +128,9 @@ enum chimera_ortho_layers {
 // instead af command + tab.
 #define KC_ALTAB ALT_TAB
 
+// ctl+' is used to pop out a term in my setup
+#define KC_CTQUOT LCTL(KC_QUOT)
+
 enum custom_keycodes {
   KC_TEST = SAFE_RANGE,
   ALT_TAB,
@@ -147,18 +150,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
        TAB  , RS(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LS(S) ,  MINS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-    SHFT_C ,RN(SCLN),   Q   , AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LN(Z) , SHFT_C,
+    SHFT_C ,RN(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LN(Z) , SHFT_C,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-                                       OCTL ,  OGUI ,                      SPC_FN ,CO(BSPC)
+                                       OGUI ,  OCTL ,                      SPC_FN ,CO(BSPC)
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
   ),
 
   // use X(dvo k-qwer) as lock?
   // XXX remember the shifted keys don't work well wit software dvorak!!
+  // will probably have to introduce a macro for shifted ansi keys to work for hardwire dvorak (os in qwerty),
+  // soft dvorak (os in dvorak) and possibly qwerty??
 
    [_SPACE_FN] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
-      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,        ESC  , PGUP  , BSPC  ,  UP   ,  DEL  , _____ ,  BSLS ,
+      _____ , CTQUOT, _____ , _____ , _____ , _____ , _____ ,        ESC  , PGUP  , BSPC  ,  UP   ,  DEL  , _____ ,  BSLS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ , ALTAB , _____ , _____ , _____ , _____ , _____ ,       _____ , PGDN  , LEFT  , DOWN  , RIGHT ,  ENT  ,  EQL  ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
@@ -172,7 +177,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // maybe have plus and pipe on their own
   [_CODING] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
-      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,       _____ , _____ ,  LBRC ,  RBRC , _____ , _____ ,  PIPE ,
+      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,        ESC  , _____ ,  LBRC ,  RBRC , _____ , _____ ,  PIPE ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ , _____ , _____ , _____ , _____ , _____ ,       _____ , _____ ,  LPRN ,  RPRN , _____ ,  ENT  ,  PLUS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
@@ -246,6 +251,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // above is not maintained
   // divergence : lock moved away from space
   // TODO: space_Fn in lock mode doesn't work. it probably has to do wit the way layers are stacked
+  // for now lk has been put back on spc too
   [_NUM] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.         ,-------+-------+-------+-------+-------+-------+-------.
       _____ ,   0   ,   9   ,   8   ,   7   ,  LBRC , _____ ,           _____ ,  RBRC ,   7   ,   8   ,   9   ,   0   , _____ ,
@@ -254,7 +260,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+-------+-------+-------+-------+-------+-------|         |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ ,   3   ,   2   ,   1   ,  LCBR , _____ ,           _____ ,  RCBR ,   1   ,   2   ,   3   , _____ , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|         |-------+-------+-------+-------+-------+-------+-------|
-                                      _____ , _____ ,                           SPC_FN, _____
+                                      _____ , _____ ,                           NUM_LK, _____
   // \------------------------------+-------+-------+------/           \------+-------+-------+------------------------------/
   ),
 
@@ -266,7 +272,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+-------+-------+-------+-------+-------+-------|         |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ ,   3   ,   2   ,   1   ,  LCBR , _____ ,           _____ ,  RCBR ,   1   ,   2   ,   3   , _____ , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|         |-------+-------+-------+-------+-------+-------+-------|
-                                      _____ , _____ ,                           SPC_FN, _____
+                                      _____ , _____ ,                           NUM_LK, _____
   // \------------------------------+-------+-------+------/           \------+-------+-------+------------------------------/
   ),
 
@@ -489,19 +495,25 @@ void matrix_scan_user(void) {
     }
 #endif
 
-    if (caps_lock) {
+    if (get_oneshot_locked_mods() || get_oneshot_mods()) {
+      // most precedence, locked mod
       set_led_red;
       return;
     }
+
+    if (caps_lock) {
+      // second most, caps lock on.
+      set_led_magenta;
+      return;
+    }
+
     switch (layer) {
     case _DVORAK:
       set_led_green;
       break;
     case _SPACE_FN:
-      set_led_white;
-      break;
     case _CODING:
-      set_led_cyan;
+      set_led_white;
       break;
     case _NUMLEFT:
     case _NUMLEFT_LK:
@@ -514,7 +526,7 @@ void matrix_scan_user(void) {
     case _SYMBLEFT:
     case _SYMBRIGHT:
     case _SYMB:
-      set_led_magenta;
+      set_led_cyan;
       break;
     case _MOUSE:
     case _MOUSE_LK:
