@@ -1,9 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "process_keycode/process_tap_dance.h"
 
-#define DEBOUNCE_CAPS_DELAY 100
-static bool caps_lock = false;
-
 enum chimera_ortho_layers {
   _DVORAK,
   _SPACE_FN,
@@ -39,11 +36,6 @@ enum chimera_ortho_layers {
 
 // activate one shot shift (in the tap dance for caps)
 #define ONESHOT_SFT
-
-// ALTAB functionality where holding the altab (space + tab)
-// also scrolls through the list at fixed speed.
-#define ALT_TAB_SCROLL
-#define ALT_TAB_SPEED 260
 
 // == MODS ==
 // ==========
@@ -83,6 +75,8 @@ enum chimera_ortho_layers {
 
 #define KC_MOU(_a) LT(_MOUSE, KC_##_a)
 
+#define KC_ADJ MO(_ADJUST)
+
 // ESCC is the ESC that also cancels one shot mods
 // it needs to be defined to what the key is currently set at.
 #define ESCC KC_MOU(ESC)
@@ -116,11 +110,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_DVORAK] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
-   MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   , _____ ,        GRV  ,   F   ,   G   ,   C   ,   R   , LF(L) ,  SLSH ,
+   MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   ,  ADJ  ,        GRV  ,   F   ,   G   ,   C   ,   R   , LF(L) ,  SLSH ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-       TAB  , RS(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LS(S) ,  MINS ,
+       TAB  , RN(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LN(S) ,  MINS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-    SHFT_C ,RN(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LN(Z) , SHFT_C,
+    SHFT_C ,RS(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LS(Z) , SHFT_C,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
                                        OGUI ,  OCTL ,                      SPC_FN ,CO(BSPC)
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
@@ -207,8 +201,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
   ),
 
-
   // TODO func layer.
+
+  // change layouts and other virtual dip magics
+  // maybe also audio control?
+  // AG_SWAP swaps alt / gui
+  // AG_NORM puts them back
+  // (also possible to use AG_TOGGLE) but makes it harder to know which mode im in.
+  [_ADJUST] = LAYOUT(
+  //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
+      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,       _____ , _____ , _____ , _____ , _____ ,AG_NORM,AG_SWAP,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,       _____ , _____ , _____ , _____ , _____ , _____ , _____ ,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+      _____ , _____ , _____ , _____ , _____ , _____ , _____ ,       _____ , _____ , _____ , _____ , _____ , _____ , _____ ,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+                                      _____ , _____ ,                       _____ , _____
+  // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
+  ),
 
   // reversed up down scroll (mac os default)
   // TODO: correct-order for windows mode?
@@ -238,7 +248,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-// TODO : share all this with hhkb in a lib.
+// TODO : share everything below with HHKB on a lib
+// ================================================
+
+// SHIFT CAPSLOCK
+#define DEBOUNCE_CAPS_DELAY 100
+static bool caps_lock = false;
+
+// ALTAB
+#define ALT_TAB_HOLD_DURATION 700
+bool is_alt_tab_active = false;
+uint16_t alt_tab_timer = 0;
+
 bool cancel_all_oneshots(void) {
   bool queue = true;
 
@@ -271,8 +292,22 @@ bool cancel_all_oneshots(void) {
   return queue;
 }
 
-bool alt_tab_enabled;
-uint32_t alt_tab_timer;
+bool is_mac_os(void) {
+  if(keymap_config.swap_lalt_lgui || keymap_config.swap_ralt_rgui) {
+    return false;
+  }
+  return true;
+}
+
+// get the "alt" in alttab functionality
+// cmd for mac os
+// alt for windows
+uint16_t get_alt_key(void) {
+  if (!is_mac_os()) {
+    return KC_LALT;
+  }
+  return KC_LGUI;
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   bool queue = true;
@@ -291,25 +326,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
 
   switch (keycode) {
+
+  // ALTAB
   case ALT_TAB:
-    alt_tab_enabled = record->event.pressed;
-    if (alt_tab_enabled) {
+    if (record->event.pressed) {
+      if (!is_alt_tab_active) {
+        is_alt_tab_active = true;
+        register_code(get_alt_key());
+      }
       alt_tab_timer = timer_read();
-      // would be LALT for windows-mode
-      register_code(KC_LGUI);
-      tap_code(KC_TAB);
+      register_code(KC_TAB);
     } else {
-      // would be LALT for windows-mode
-      unregister_code(KC_LGUI);
+      unregister_code(KC_TAB);
     }
     break;
   case KC_LEFT:
   case KC_RIGHT:
-    // if we're altab scrolling, and an arrow is sent. stop the process.
-    if (alt_tab_enabled && record->event.pressed) {
-      alt_tab_enabled = false;
+    // if we're altab'ing, and an arrow is sent. prolongue the timer
+    if (is_alt_tab_active && record->event.pressed) {
+      alt_tab_timer = timer_read();
     }
     break;
+  case KC_SPC_FN:
+    // if we're altabing and spc fn is realeased, stop
+    if (is_alt_tab_active && !record->event.pressed) {
+      is_alt_tab_active = false;
+      unregister_code(get_alt_key());
+    }
+
+  // ESC CANCEL OSM
   case ESCC:
     if (record->event.pressed) {
       dprint("ESC CANCEL MODS pressed\n");
@@ -321,7 +366,56 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return queue;
 };
 
-// TODO share with hhkb.
+void matrix_scan_user(void) {
+  uint8_t layer = biton32(layer_state);
+
+  // ALTAB
+  if (is_alt_tab_active) {
+    if (timer_elapsed(alt_tab_timer) > ALT_TAB_HOLD_DURATION) {
+      // unregister_code16(LALT(KC_TAB));
+      unregister_code(get_alt_key());
+      is_alt_tab_active = false;
+    }
+  }
+
+  // LEDS
+  if (get_oneshot_locked_mods() || get_oneshot_mods()) {
+    // most precedence, locked mod
+    set_led_red;
+    return;
+  }
+
+  if (caps_lock) {
+    // second most, caps lock on.
+    set_led_magenta;
+    return;
+  }
+
+  switch (layer) {
+  case _DVORAK:
+    set_led_green;
+    break;
+  case _SPACE_FN:
+  case _CODING:
+    set_led_white;
+    break;
+  case _NUM:
+  case _NUM_LK:
+    set_led_blue;
+    break;
+  case _SYMB:
+    set_led_cyan;
+    break;
+  case _MOUSE:
+  case _MOUSE_LK:
+    set_led_yellow;
+    break;
+  default:
+    set_led_green;
+    break;
+  }
+};
+
 // adapted from
 // https://beta.docs.qmk.fm/features/feature_tap_dance#example-5-using-tap-dance-for-advanced-mod-tap-and-layer-tap-keys
 
@@ -392,60 +486,8 @@ void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
 //Tap Dance Definitions
 qk_tap_dance_action_t tap_dance_actions[] = {
   //Tap once for Shift, twice for Caps Lock
-  // try to do same as tap dance double but with print
   [TD_SFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, sft_finished, sft_reset, 180),
 };
-
-// TODO : set leds for any lock mods
-// or num // symb active
-
-void matrix_scan_user(void) {
-    uint8_t layer = biton32(layer_state);
-
-#ifdef ALT_TAB_SCROLL
-    if ( alt_tab_enabled && (timer_elapsed(alt_tab_timer) > ALT_TAB_SPEED) ) {
-      tap_code(KC_TAB);
-      alt_tab_timer = timer_read();
-    }
-#endif
-
-    if (get_oneshot_locked_mods() || get_oneshot_mods()) {
-      // most precedence, locked mod
-      set_led_red;
-      return;
-    }
-
-    if (caps_lock) {
-      // second most, caps lock on.
-      set_led_magenta;
-      return;
-    }
-
-    switch (layer) {
-    case _DVORAK:
-      set_led_green;
-      break;
-    case _SPACE_FN:
-    case _CODING:
-      set_led_white;
-      break;
-    case _NUM:
-    case _NUM_LK:
-      set_led_blue;
-      break;
-    case _SYMB:
-      set_led_cyan;
-      break;
-    case _MOUSE:
-    case _MOUSE_LK:
-      set_led_yellow;
-      break;
-    default:
-      set_led_green;
-      break;
-    }
-};
-
 
 void keyboard_post_init_user(void) {
   // Customise these values to desired behaviour
