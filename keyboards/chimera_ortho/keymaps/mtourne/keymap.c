@@ -356,6 +356,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       is_alt_tab_active = false;
       unregister_code(get_alt_key());
     }
+    break;
 
   // ESC CANCEL OSM
   case ESCC:
