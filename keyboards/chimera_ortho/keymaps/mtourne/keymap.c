@@ -105,14 +105,16 @@ enum {
   TD_SFT_CAPS = 0
 };
 
-// TODO : do something cool with unassigned keys.
+// TODO : * maybe make long press C and R as () - currently backspace layer is error prone
+//        * now that there is a CT(TAB) key maybe thumb control can be used as a dedicated layer for things?
+//        * do something cool with unassigned keys.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_DVORAK] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
    MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   ,  ADJ  ,        GRV  ,   F   ,   G   ,   C   ,   R   , LF(L) ,  SLSH ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-       TAB  , RN(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LN(S) ,  MINS ,
+   CT(TAB)  , RN(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LN(S) ,  MINS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
     SHFT_C ,RS(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LS(Z) , SHFT_C,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
@@ -256,7 +258,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 static bool caps_lock = false;
 
 // ALTAB
-#define ALT_TAB_HOLD_DURATION 700
+#define ALT_TAB_HOLD_DURATION 1000
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
 
@@ -292,6 +294,7 @@ bool cancel_all_oneshots(void) {
   return queue;
 }
 
+// mas os is the default (not shifted)
 bool is_mac_os(void) {
   if(keymap_config.swap_lalt_lgui || keymap_config.swap_ralt_rgui) {
     return false;
