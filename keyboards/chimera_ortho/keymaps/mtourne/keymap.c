@@ -12,6 +12,7 @@ enum chimera_ortho_layers {
   _NUM,
   _NUM_LK,
   _SYMB,
+  _SPC_NUM,
   // TODO implem func
   _FUNC,
 
@@ -33,9 +34,16 @@ enum chimera_ortho_layers {
 // =============
 
 // #define VERBOSE_DEBUG
+// #define DEBUG
+#ifdef VERBOSE_DEBUG
+#define DEBUG
+#endif
 
 // activate one shot shift (in the tap dance for caps)
 #define ONESHOT_SFT
+
+// failed? experiment of having long press actions
+// #define TAP_HOLD_EXPERIMENT
 
 // == MODS ==
 // ==========
@@ -50,8 +58,6 @@ enum chimera_ortho_layers {
 #define KC_BSPC_SYM KC_BSPC
 // space function
 #define KC_SPC_FN  LT(_SPACE_FN, KC_SPC)
-// tap dance shift -> caps
-#define KC_SHFT_C TD(TD_SFT_CAPS)
 
 // == MACROS ==
 // ============
@@ -70,6 +76,7 @@ enum chimera_ortho_layers {
 #define KC_RN(_a) LT(_NUM, KC_##_a)
 #define KC_RS(_a) LT(_SYMB, KC_##_a)
 #define KC_RF(_a) LT(_FUNC, KC_##_a)
+#define KC_RSN(_a) LT(_SPC_NUM, KC_##_a)
 
 #define KC_CC(_a) LCTL(KC_##_a)
 
@@ -102,23 +109,40 @@ enum custom_keycodes {
 
 //Tap Dance Declarations
 enum {
-  TD_SFT_CAPS = 0
+  TD_SFT_CAPS = 0,
+  TD_C_LPRN,
+  TD_R_RPRN,
+  TD_MINS_ENT,
 };
 
+#define KC_SHFT_C TD(TD_SFT_CAPS)
+
+#ifdef TAP_HOLD_EXPERIMENT
+#define KC_C_LPR  TD(TD_C_LPRN)
+#define KC_R_RPR  TD(TD_R_RPRN)
+#define KC_MIN_ENT TD(TD_MINS_ENT)
+
+#else
+
+#define KC_C_LPR KC_C
+#define KC_R_RPR KC_R
+// #define KC_MIN_ENT KC_MINS
+#define KC_MIN_ENT TD(TD_MINS_ENT)
+
+#endif
 // TODO : * maybe make long press C and R as () - currently backspace layer is error prone
-//        * now that there is a CT(TAB) key maybe thumb control can be used as a dedicated layer for things?
 //        * do something cool with unassigned keys.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_DVORAK] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
-   MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   ,  ADJ  ,        GRV  ,   F   ,   G   ,   C   ,   R   , LF(L) ,  SLSH ,
+   MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   ,  ADJ  ,        GRV  ,   F   ,   G   , C_LPR , R_RPR , LF(L) ,  SLSH ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-   CT(TAB)  , RN(A) ,   O   ,   E   ,   U   ,   I   , _____,         ENT  ,   D  ,    H   ,   T   ,   N   , LN(S) ,  MINS ,
+       TAB  , RN(A) , CO(O) ,   E   ,   U   , RSN(I), _____ ,        ENT  ,   D  ,    H   ,   T   , CO(N) , LN(S) ,MIN_ENT,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
     SHFT_C ,RS(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LS(Z) , SHFT_C,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-                                       OGUI ,  OCTL ,                      SPC_FN ,CO(BSPC)
+                                       OGUI ,  OCTL ,                      SPC_FN ,  BSPC
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
   ),
 
@@ -145,7 +169,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
       _____ , _____ , _____ ,  LBRC ,  RBRC , _____ , _____ ,        ESC  , _____ ,  LBRC ,  RBRC , _____ , _____ ,  PIPE ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-      _____ , _____ , _____ ,  LPRN ,  RPRN , _____ , _____ ,       _____ , _____ ,  LPRN ,  RPRN , _____ ,  ENT  ,  PLUS ,
+      _____ , _____ , _____ ,  LPRN ,  RPRN , _____ , _____ ,       _____ , _____ ,  LPRN ,  RPRN , _____ , _____ ,  PLUS ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ , _____ ,  LCBR ,  RCBR , _____ , _____ ,       _____ , _____ ,  LCBR ,  RCBR , _____ , _____ , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
@@ -175,19 +199,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ ,   3   ,   2   ,   1   ,  LCBR , _____ ,       _____ ,  RCBR ,   1   ,   2   ,   3   , _____ , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-                                      _____ , _____ ,                       NUM_LK, _____
+                                      _____ , _____ ,                       _____ , _____
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
   ),
 
   [_NUM_LK] = LAYOUT_kc(
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
-      _____ ,   0   ,   9   ,   8   ,   7   ,  LBRC , _____ ,       _____ ,  RBRC ,   7   ,   8   ,   9   ,   0   , _____ ,
+      NUM_LK,   0   ,   9   ,   8   ,   7   ,  LBRC , _____ ,       _____ ,  RBRC ,   7   ,   8   ,   9   ,   0   , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ ,   0   ,   6   ,   5   ,   4   ,  LPRN , NUM_LK,       _____ ,  RPRN ,   4   ,   5   ,   6   ,   0   , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
       _____ , _____ ,   3   ,   2   ,   1   ,  LCBR , _____ ,       _____ ,  RCBR ,   1   ,   2   ,   3   , _____ , _____ ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-                                      _____ , _____ ,                       NUM_LK, _____
+                                      _____ , _____ ,                       _____ , _____
+  // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
+  ),
+
+  // layer that would send space + number so I can switch buffers really fast in spacemacs
+  [_SPC_NUM] = LAYOUT_kc(
+  //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
+      _____ ,   0   ,   9   ,   8   ,   7   ,  LBRC , _____ ,       _____ ,  RBRC ,   7   ,   8   ,   9   ,   0   , _____ ,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+      _____ ,   0   ,   6   ,   5   ,   4   ,  LPRN , _____ ,       _____ ,  RPRN ,   4   ,   5   ,   6   ,   0   , _____ ,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+      _____ , _____ ,   3   ,   2   ,   1   ,  LCBR , _____ ,       _____ ,  RCBR ,   1   ,   2   ,   3   , _____ , _____ ,
+  //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
+                                      _____ , _____ ,                       _____ , _____
   // \------------------------------+-------+-------+------/       \------+-------+-------+------------------------------/
   ),
 
@@ -313,6 +350,7 @@ uint16_t get_alt_key(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  uint8_t layer = biton32(layer_state);
   bool queue = true;
 
 #ifdef VERBOSE_DEBUG
@@ -363,6 +401,28 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
       dprint("ESC CANCEL MODS pressed\n");
       queue = cancel_all_oneshots();
+    }
+    break;
+
+  // _SPC_NUM attempt
+  case KC_O:
+  case KC_1:
+  case KC_2:
+  case KC_3:
+  case KC_4:
+  case KC_5:
+  case KC_6:
+  case KC_7:
+  case KC_8:
+  case KC_9:
+    if (layer == _SPC_NUM) {
+      if (record->event.pressed) {
+        register_code(KC_SPC);
+        register_code(keycode);
+      } else {
+        unregister_code(keycode);
+        unregister_code(KC_SPC);
+      }
     }
     break;
   }
@@ -430,9 +490,6 @@ typedef enum {
   DOUBLE_SINGLE_TAP
 } td_state_t;
 
-// create a global instance of the tapdance state type
-static td_state_t td_state_sft;
-
 // determine the tapdance state to return
 int cur_dance(qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -449,8 +506,7 @@ int cur_dance(qk_tap_dance_state_t *state) {
   else { return 3; } // any number higher than the maximum state value you return above
 }
 
-// handle the possible states for each tapdance keycode you define:
-
+static td_state_t td_state_sft;
 void sft_finished(qk_tap_dance_state_t *state, void *user_data) {
   td_state_sft = cur_dance(state);
   if (td_state_sft == DOUBLE_SINGLE_TAP) {
@@ -487,15 +543,63 @@ void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
   unregister_code(KC_LSFT);
 }
 
+typedef struct {
+  uint16_t tap_kc;
+  uint16_t hold_kc;
+  td_state_t state;
+} th_t;
+
+static th_t tap_hold_table[] = {
+  [TD_C_LPRN] = { KC_C, KC_LPRN, 0},
+  [TD_R_RPRN] = { KC_R, KC_RPRN, 0},
+  [TD_MINS_ENT] = { KC_MINS, KC_ENT, 0},
+};
+
+void tap_hold_finished(qk_tap_dance_state_t *state, void *user_data) {
+  th_t *entry = (th_t*)user_data;
+
+  entry->state = cur_dance(state);
+  if (entry->state == SINGLE_HOLD) {
+    register_code(entry->hold_kc);
+  } else {
+    register_code(entry->tap_kc);
+  }
+}
+
+void tap_hold_reset(qk_tap_dance_state_t *state, void *user_data) {
+  th_t *entry = (th_t*)user_data;
+
+  if (entry->state == SINGLE_HOLD) {
+    unregister_code(entry->hold_kc);
+  } else {
+    unregister_code(entry->tap_kc);
+  }
+}
+
+
+#define ACTION_TAP_HOLD(user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_dance_reset, entry) { \
+    .fn = { user_fn_on_each_tap, user_fn_on_dance_finished, user_fn_on_dance_reset }, \
+    .user_data = (void *)&tap_hold_table[entry],                                      \
+   }
+
 //Tap Dance Definitions
 qk_tap_dance_action_t tap_dance_actions[] = {
   //Tap once for Shift, twice for Caps Lock
   [TD_SFT_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, sft_finished, sft_reset, 180),
+  // only works for hardwired dvorak. would have to do advanced funcs to return the right KC in all settings.
+  // c -> ( , r -> )
+  [TD_C_LPRN] = ACTION_TAP_HOLD(NULL, tap_hold_finished, tap_hold_reset, TD_C_LPRN),
+  [TD_R_RPRN] = ACTION_TAP_HOLD(NULL, tap_hold_finished, tap_hold_reset, TD_R_RPRN),
+  // - -> ENT
+  // [TD_MINS_ENT] = ACTION_TAP_HOLD(NULL, tap_hold_finished, tap_hold_reset, TD_MINS_ENT),
+  [TD_MINS_ENT] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_ENT),
 };
 
 void keyboard_post_init_user(void) {
   // Customise these values to desired behaviour
+#ifdef DEBUG
   debug_enable=true;
+#endif
   //debug_matrix=true;
   //debug_keyboard=true;
   //debug_mouse=true;
