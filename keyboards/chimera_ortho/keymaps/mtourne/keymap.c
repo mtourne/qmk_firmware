@@ -76,7 +76,8 @@ enum chimera_ortho_layers {
 #define KC_RN(_a) LT(_NUM, KC_##_a)
 #define KC_RS(_a) LT(_SYMB, KC_##_a)
 #define KC_RF(_a) LT(_FUNC, KC_##_a)
-#define KC_RSN(_a) LT(_SPC_NUM, KC_##_a)
+
+#define KC_SN(_a) LT(_SPC_NUM, KC_##_a)
 
 #define KC_CC(_a) LCTL(KC_##_a)
 
@@ -126,8 +127,8 @@ enum {
 
 #define KC_C_LPR KC_C
 #define KC_R_RPR KC_R
-// #define KC_MIN_ENT KC_MINS
-#define KC_MIN_ENT TD(TD_MINS_ENT)
+#define KC_MIN_ENT KC_MINS
+// #define KC_MIN_ENT TD(TD_MINS_ENT)
 
 #endif
 // TODO : * maybe make long press C and R as () - currently backspace layer is error prone
@@ -138,7 +139,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-------+-------+-------+-------+-------+-------+-------.     ,-------+-------+-------+-------+-------+-------+-------.
    MOU(ESC),RF(QUOT), COMM  ,   DOT ,   P   ,   Y   ,  ADJ  ,        GRV  ,   F   ,   G   , C_LPR , R_RPR , LF(L) ,  SLSH ,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
-       TAB  , RN(A) , CO(O) ,   E   ,   U   , RSN(I), _____ ,        ENT  ,   D  ,    H   ,   T   , CO(N) , LN(S) ,MIN_ENT,
+       TAB  , RN(A) , CO(O) ,   E   ,   U   , SN(I) , _____ ,        ENT  , SN(D) ,   H   ,   T   , CO(N) , LN(S) ,MIN_ENT,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
     SHFT_C ,RS(SCLN), MOU(Q), AL(J) , GU(K) , CT(X) ,  OALT ,        ENT  , CT(B) , GU(M) , AL(W) , LN(V) , LS(Z) , SHFT_C,
   //|-------+-------+-------+-------+-------+-------+-------|     |-------+-------+-------+-------+-------+-------+-------|
@@ -436,7 +437,6 @@ void matrix_scan_user(void) {
   // ALTAB
   if (is_alt_tab_active) {
     if (timer_elapsed(alt_tab_timer) > ALT_TAB_HOLD_DURATION) {
-      // unregister_code16(LALT(KC_TAB));
       unregister_code(get_alt_key());
       is_alt_tab_active = false;
     }
