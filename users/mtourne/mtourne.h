@@ -3,6 +3,11 @@
 
 #include QMK_KEYBOARD_H
 
+// short tapping term for the spc bar
+// TAPPING_TERM_PER_KEY needs to be set in config.h
+#define TAPPING_TERM_SPC_FN 200
+
+
 // == LAYERS ==
 // =============
 
@@ -120,7 +125,7 @@ enum custom_keycodes {
 
 // function defs
 bool mtourne_process_record_user(uint16_t keycode, keyrecord_t *record);
-
 void matrix_scan_altab(void);
+uint16_t mtourne_get_tapping_term(uint16_t keycode);
 
 #endif

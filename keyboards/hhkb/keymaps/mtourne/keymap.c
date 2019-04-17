@@ -87,8 +87,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_PWR, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_INS, KC_DEL,
         KC_CAPS, KC_MPLY, KC_MPRV, KC_MNXT, ____, ____, ____, ____, KC_PSCR, KC_SLCK, KC_PAUS, KC_UP, ____, KC_BSPC,
         ____, KC_VOLD, KC_VOLU, KC_MUTE, KC_EJCT, ____, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_ENT,
-        ____, QWERTY, DVORAK, ____, ____, ____, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, ____, ____,
-        AG_NORM, AG_SWAP, ____, KC_MSTP, ____),
+        ____, QWERTY, DVORAK, AG_NORM, AG_SWAP, ____, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, ____, ____,
+        ____, ____, ____, KC_MSTP, ____),
 
 
     [_MOUSE] = LAYOUT(
@@ -187,20 +187,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
    return mtourne_process_record_user(keycode, record);
 }
 
-// TODO permanent qwerty / dvoark set (survives restart)
-uint32_t layer_state_set_user(uint32_t state) {
-  switch (biton32(state)) {
-
-  default:
-      break;
-  }
-
-  return state;
-}
-
 void matrix_scan_user(void){
    // altab func.
    matrix_scan_altab();
+}
+
+// long tapping term for everyone else
+uint16_t get_tapping_term(uint16_t keycode) {
+   return mtourne_get_tapping_term(keycode);
 }
 
 void keyboard_post_init_user(void) {

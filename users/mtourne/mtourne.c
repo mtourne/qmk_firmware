@@ -1,6 +1,20 @@
 #include QMK_KEYBOARD_H
 #include "mtourne.h"
 
+// short tap for spc_fn
+// long tapping term for everyone else
+uint16_t mtourne_get_tapping_term(uint16_t keycode) {
+   switch (keycode) {
+      case KC_SPC_FN:
+#ifdef VERBOSE_DEBUG
+         dprint("spc fn tapping term!\n");
+#endif
+         return TAPPING_TERM_SPC_FN;
+      default:
+         return TAPPING_TERM;
+   }
+}
+
 // SHIFT CAPSLOCK
 #define DEBOUNCE_CAPS_DELAY 100
 static bool caps_lock = false;

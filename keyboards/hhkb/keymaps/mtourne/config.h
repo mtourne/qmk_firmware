@@ -13,7 +13,11 @@
 // Increase "Tap" detection window.
 // this what governs LT() macro and spacebar tap
 #undef TAPPING_TERM
-#define TAPPING_TERM 300 
+#define TAPPING_TERM 300
+
+// each key can now have their own tapping_term
+// spc fn is set to 200 (mtourne.h)
+#define TAPPING_TERM_PER_KEY
 
 // if sending space+key within the tapping term it should register correctly.
 #define PERMISSIVE_HOLD
@@ -43,11 +47,6 @@
 // but ideally I'll have an easy way to reset them
 #define ONESHOT_TAP_TOGGLE 2  /* Tapping this number of times holds the key until tapped once again. */
 // 4.5 secs.
-#define ONESHOT_TIMEOUT 4500
-
-// this might help with holding down ctl on the LLCTL layer?
-// a: it does hit the next key held but doesnt come back up to default layer
-// #define STRICT_LAYER_RELEASE
-
+#define ONESHOT_TIMEOUT 3000
 
 #endif
