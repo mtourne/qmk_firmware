@@ -10,6 +10,11 @@ uint16_t mtourne_get_tapping_term(uint16_t keycode) {
          dprint("spc fn tapping term!\n");
 #endif
          return TAPPING_TERM_SPC_FN;
+
+      // mouse key on left home row! really long tap term
+      // XXX how to make any MOU(*) automatic 400ms ?
+      case MOU(KC_U):
+        return 400;
       default:
          return TAPPING_TERM;
    }
@@ -44,14 +49,14 @@ bool cancel_all_oneshots(void) {
   dprintf("after: oneshot_mods(): %d, oneshot_locked_mods: %d, mods: %d\n", get_oneshot_mods(), get_oneshot_locked_mods(), get_mods());
 
   // XX should esc release caps lock too?
-  //if (caps_lock) {
-  //  caps_lock = false;
-  //  dprint("caps lock off\n");
-  //  register_code(kc_capslock);
-  //  wait_ms(debounce_caps_delay);
-  //  unregister_code(kc_capslock);
-  //  queue = false;
-  //}
+  if (caps_lock) {
+      caps_lock = false;
+      dprint("caps lock off\n");
+      register_code(KC_CAPSLOCK);
+      wait_ms(DEBOUNCE_CAPS_DELAY);
+      unregister_code(KC_CAPSLOCK);
+      queue = false;
+  }
 
   return queue;
 }
@@ -97,13 +102,15 @@ bool mtourne_process_record_user(uint16_t keycode, keyrecord_t *record) {
   // Permanent layer switch
   case QWERTY:
      if (record->event.pressed) {
-        set_single_persistent_default_layer(_QWERTY);
+         dprint("peristent set layer to _QWERTY.");
+         set_single_persistent_default_layer(_QWERTY);
      }
      return false;
      break;
   case DVORAK:
      if (record->event.pressed) {
-        set_single_persistent_default_layer(_DVORAK);
+         dprint("peristent set layer to _DVORAK.");
+         set_single_persistent_default_layer(_DVORAK);
      }
      return false;
      break;
