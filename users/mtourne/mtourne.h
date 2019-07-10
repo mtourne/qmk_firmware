@@ -44,6 +44,7 @@ enum mtourne_layers {
 
 // #define VERBOSE_DEBUG
 // #define DEBUG
+
 #ifdef VERBOSE_DEBUG
 #define DEBUG
 #endif
@@ -113,8 +114,9 @@ enum {
 // ==========
 // TODO: on windows-mode should be actual alt+tab
 // instead af command + tab.
-#define KC_ALTAB ALT_TAB
-
+#define KC_ALTAB  ALT_TAB
+#define KC_DVORAK DVORAK
+#define KC_QWERTY QWERTY
 
 enum custom_keycodes {
    ALT_TAB = SAFE_RANGE,
