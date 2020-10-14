@@ -82,6 +82,7 @@ enum mtourne_layers {
 
 #define KC_SN(_a) LT(_SPC_NUM, KC_##_a)
 
+// add a control before sending the code
 #define KC_CC(_a) LCTL(KC_##_a)
 
 #define KC_MOU(_a) LT(_MOUSE, KC_##_a)
@@ -92,6 +93,8 @@ enum mtourne_layers {
 // ESCC is the ESC that also cancels one shot mods
 // it needs to be defined to what the key is currently set at.
 #define ESCC KC_ESC
+
+#define KC_LALT(_a) LALT(KC_##_a)
 
 // == LOCKS ==
 // ===========

@@ -43,10 +43,14 @@
 #define MOUSEKEY_WHEEL_TIME_TO_MAX  255
 #define MOUSEKEY_WHEEL_MAX_SPEED    1
 
+// NOTE 2020-08-01 - dunno what that means below.
 // I want ctrl and alt from the util layer to stick
 // but ideally I'll have an easy way to reset them
-#define ONESHOT_TAP_TOGGLE 2  /* Tapping this number of times holds the key until tapped once again. */
-// 4.5 secs.
-#define ONESHOT_TIMEOUT 3000
+
+// Tapping this number of times holds the key until tapped once again
+// or ESC (customized esc to remove stickies)
+#define ONESHOT_TAP_TOGGLE 3
+// HOLD control, alt, shift 1 secs.
+#define ONESHOT_TIMEOUT 1000
 
 #endif

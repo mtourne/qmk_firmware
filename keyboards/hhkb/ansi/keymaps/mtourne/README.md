@@ -3,10 +3,10 @@
 ## Deploy
 
 build:
-`make hhkb:mtourne`
+`make hhkb/ansi:mtourne`
 
 deploy:
-`make hkkb:mtourne:dfu`
+`make hkkb/ansi:mtourne:dfu`
 
 ## Modifications
 

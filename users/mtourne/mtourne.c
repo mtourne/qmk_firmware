@@ -5,7 +5,7 @@
 // long tapping term for everyone else
 uint16_t mtourne_get_tapping_term(uint16_t keycode) {
    switch (keycode) {
-      case KC_SPC_FN:
+   case KC_SPC_FN:
 #ifdef VERBOSE_DEBUG
          dprint("spc fn tapping term!\n");
 #endif
@@ -13,10 +13,11 @@ uint16_t mtourne_get_tapping_term(uint16_t keycode) {
 
       // mouse key on left home row! really long tap term
       // XXX how to make any MOU(*) automatic 400ms ?
-      case MOU(KC_U):
+   case MOU(KC_F):
+   case MOU(KC_U):
         return 400;
-      default:
-         return TAPPING_TERM;
+   default:
+     return TAPPING_TERM;
    }
 }
 
