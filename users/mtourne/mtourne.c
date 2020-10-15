@@ -5,18 +5,42 @@
 // long tapping term for everyone else
 uint16_t mtourne_get_tapping_term(uint16_t keycode) {
    switch (keycode) {
+
+     // SPACE FUNCTION
    case KC_SPC_FN:
 #ifdef VERBOSE_DEBUG
          dprint("spc fn tapping term!\n");
 #endif
          return TAPPING_TERM_SPC_FN;
 
-      // mouse key on left home row! really long tap term
-      // XXX how to make any MOU(*) automatic 400ms ?
+   // MODIFIERS
+   case LCTL_T(KC_Z):
+   case RCTL_T(KC_SLASH):
+   case LALT_T(KC_C):
+   case RALT_T(KC_COMM):
+   case LGUI_T(KC_V):
+#ifdef VERBOSE_DEBUG
+         dprint("MODS tapping term!\n");
+#endif
+         return TAPPING_TERM_IN_KEEB_MODS;
+
+   case RGUI_T(KC_M):
+     #ifdef VERBOSE_DEBUG
+         dprint("MODS tapping term + 50 for M key!\n");
+     #endif
+         return TAPPING_TERM_IN_KEEB_MODS + 50;
+
+   // MOUSE
+   // XXX how to make any MOU(*) automatically TAPPING_TERM_MOUSE_KEY
    case MOU(KC_F):
    case MOU(KC_U):
-        return 400;
+#ifdef VERBOSE_DEBUG
+         dprint("mouse tapping term!\n");
+#endif
+        return TAPPING_TERM_MOUSE_KEY;
+
    default:
+
      return TAPPING_TERM;
    }
 }
@@ -26,7 +50,6 @@ uint16_t mtourne_get_tapping_term(uint16_t keycode) {
 static bool caps_lock = false;
 
 // ALTAB
-#define ALT_TAB_HOLD_DURATION 1000
 static bool is_alt_tab_active = false;
 static uint16_t alt_tab_timer = 0;
 

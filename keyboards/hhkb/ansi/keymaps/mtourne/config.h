@@ -49,8 +49,7 @@
 
 // Tapping this number of times holds the key until tapped once again
 // or ESC (customized esc to remove stickies)
-#define ONESHOT_TAP_TOGGLE 3
-// HOLD control, alt, shift 1 secs.
-#define ONESHOT_TIMEOUT 1000
-
+#define ONESHOT_TAP_TOGGLE 4
+// HOLD control, alt, shift for (in ms)
+#define ONESHOT_TIMEOUT 650
 #endif

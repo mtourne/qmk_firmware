@@ -3,10 +3,21 @@
 
 #include QMK_KEYBOARD_H
 
+// == TIMINGS ==
+// =============
+
+#define ALT_TAB_HOLD_DURATION 800
+
 // short tapping term for the spc bar
 // TAPPING_TERM_PER_KEY needs to be set in config.h
 #define TAPPING_TERM_SPC_FN 200
 
+// short tapping term for modifiers in keeb
+// TAPPING_TERM_PER_KEY needs to be set in config.h
+#define TAPPING_TERM_IN_KEEB_MODS 150
+
+// long tapping term for a mid keyboard mouse key
+#define TAPPING_TERM_MOUSE_KEY 300
 
 // == LAYERS ==
 // =============
@@ -74,9 +85,13 @@ enum mtourne_layers {
 
 // == MACROS ==
 // ============
-#define KC_CT(_a) CTL_T(KC_##_a)
-#define KC_AL(_a) ALT_T(KC_##_a)
-#define KC_GU(_a) GUI_T(KC_##_a)
+#define KC_LCT(_a) LCTL_T(KC_##_a)
+#define KC_LAL(_a) LALT_T(KC_##_a)
+#define KC_LGU(_a) LGUI_T(KC_##_a)
+
+#define KC_RCT(_a) RCTL_T(KC_##_a)
+#define KC_RAL(_a) RALT_T(KC_##_a)
+#define KC_RGU(_a) RGUI_T(KC_##_a)
 
 #define KC_CO(_a) LT(_CODING, KC_##_a)
 

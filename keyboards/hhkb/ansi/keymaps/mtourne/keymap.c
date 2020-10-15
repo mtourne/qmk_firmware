@@ -1,10 +1,15 @@
-
 /*
  * mtourne HHKB Layout.
 
  * NORM // SWAP modes
  *   NORM: mac os GUI (the useful one)
  *   SWAP mode for windows when ALT is the Useful key.
+
+ TODO:
+  FIX mtourne_get_tapping_term()
+  to avoid spelling out keys exactly
+  and take all mods or mouse key
+
  */
 #include QMK_KEYBOARD_H
 #include <print.h>
@@ -53,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         GRV,    1,    2,    3,    4,    5,    6,    7,    8,    9,    0,  MINS,  EQL, BSLS,  ESC,
         TAB,    Q,    W,    E,    R,    T,    Y,    U,    I,    O,    P,  LBRC, RBRC, BSPC,
       OLCTL,    A,    S,    D, MOU(F),  G,    H,    J,    K,    L, SCLN,  QUOT,  ENT,
-   SFT_CAPS,    Z, AL(X), GU(C), CT(V), B,    N,CT(M),GU(COMM),AL(DOT),SLSH,SFT_CAPS, HHKB,
+  SFT_CAPS,LCT(Z),    X,LAL(C),LGU(V),  B,    N,RGU(M),RAL(COMM),DOT,RCT(SLSH),SFT_CAPS, HHKB,
 
       //        1           2         < SPACE >        3            4
 	     OLALT,      OLGUI,         SPC_FN,     ORGUI,       ORALT
@@ -145,7 +150,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     DEL,  F1,  F2,  F3,  F4,  F5,  F1,  F7,  F8,  F9,  F10,  F11,  F12, ____, DEL,
    ____, ____, ____, ____, ____,  ____, PGUP, BSPC,  UP  ,  DEL,  ____, ____, ____, ____,
    ____, HOME, ____, END , /*F*/ ALTAB,  ____, PGDN, LEFT,  DOWN, RIGHT, ENT , ____, ____,
-    ____, ____, ____, ____, /*V*/ LALT(GRAVE), ____, ____, ____, ____, ____, ____, ____, ____,
+    ____, ____, ____, ____, /*V*/ LALT(GRAVE), /*B*/SPC, ____, ____, ____, ____, ____, ____, ____,
    ____, ____, ____, ____, ____),
 
 

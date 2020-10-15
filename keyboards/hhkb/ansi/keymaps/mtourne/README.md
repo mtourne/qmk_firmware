@@ -8,30 +8,22 @@ build:
 deploy:
 `make hkkb/ansi:mtourne:dfu`
 
-## Modifications
-
-### HHKB Layer
-
-Regular HHKB
+# Regular HHKB
 
 **plus**
 
-    * QWE: Play / prev / next
-    * Z: QWERTY
-    * X: Hardwired Dvorak (to be used with os-QWERTY)
+* hardwired dvorak
+* SpaceFn movements
+* mouse keys
+* in-keeb modifiers
 
-### Dev layer
 
-**When holding Space**
+# Extra Layers
 
+## SpaceFn
     * qwer `ijkl` movement keys
-    * wasd-style mouse keys
-    * (B qwer) inserts a space
-    * (N qwer) backspace
-    * (M qwer) Del
-    * ` -> ESC
 
-**Option .. future**
-
-    * use cluster TYGH - between arrow and mouse keys
-    for something more useful than pgup pgdown / mouse wheel up down
+## Mouse
+    * `ijkl` mouse movements
+    * activated by holding `f`(u) on the other side
+    * locked with `d`(e)
