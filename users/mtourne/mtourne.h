@@ -55,9 +55,19 @@ enum mtourne_layers {
 // == MODS ==
 // ==========
 
-#define KC_OCTL OSM(MOD_LCTL)
-#define KC_OALT OSM(MOD_LALT)
-#define KC_OGUI OSM(MOD_LGUI)
+// one shot modifiers
+// (holds modifier)
+#define KC_OLCTL OSM(MOD_LCTL)
+#define KC_ORCTL OSM(MOD_RCTL)
+
+#define KC_OLALT OSM(MOD_LALT)
+#define KC_ORALT OSM(MOD_RALT)
+
+#define KC_OLGUI OSM(MOD_LGUI)
+#define KC_ORGUI OSM(MOD_RGUI)
+
+// like OSM SHIFT with caps lock
+#define KC_SFT_CAPS TD(TD_SFT_CAPS)
 
 // space function
 #define KC_SPC_FN  LT(_SPACE_FN, KC_SPC)
