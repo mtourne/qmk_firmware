@@ -57,8 +57,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       //  1     2     3     4     5.    6     7     8.    9     10    11    12    13    14    15
         GRV,    1,    2,    3,    4,    5,    6,    7,    8,    9,    0,  MINS,  EQL, BSLS,  ESC,
         TAB,    Q,    W,    E,    R,    T,    Y,    U,    I,    O,    P,  LBRC, RBRC, BSPC,
-      OLCTL,    A,    S,    D, MOU(F),  G,    H,    J,    K,    L, SCLN,  QUOT,  ENT,
-  SFT_CAPS,LCT(Z),    X,LAL(C),LGU(V),  B,    N,RGU(M),RAL(COMM),DOT,RCT(SLSH),SFT_CAPS, HHKB,
+      OLCTL,LCT(A),   S,    D, MOU(F),  G,    H,    J,    K,    L,LCT(SCLN),QUOT, ENT,
+  SFT_CAPS,     Z,    X,LAL(C),LGU(V),  B,    N,LGU(M),LAL(COMM),DOT,RGU(SLSH),SFT_CAPS, HHKB,
 
       //        1           2         < SPACE >        3            4
 	     OLALT,      OLGUI,         SPC_FN,     ORGUI,       ORALT

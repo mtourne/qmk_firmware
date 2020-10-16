@@ -13,18 +13,38 @@ uint16_t mtourne_get_tapping_term(uint16_t keycode) {
 #endif
          return TAPPING_TERM_SPC_FN;
 
-   // MODIFIERS
-   case LCTL_T(KC_Z):
-   case RCTL_T(KC_SLASH):
+   /// MODIFIERS
+
+   /// qwerty
+   // left CTL
+   case LCTL_T(KC_A):
+   // right CTL
+   case LCTL_T(KC_SCLN):
+     #ifdef VERBOSE_DEBUG
+         dprint("MODS tapping term + 50 for CTL pinky key!\n");
+     #endif
+     return TAPPING_TERM_IN_KEEB_MODS + 50;
+
+
+   // left #MAC-ALT (#WIN-GUI)
    case LALT_T(KC_C):
-   case RALT_T(KC_COMM):
+   // right #MAC-ALT (#WIN-GUI)
+   case LALT_T(KC_COMM):
+   // left #MAC-GUI (#WIN-ALT)
    case LGUI_T(KC_V):
+
+   // right #WIN-R-ALT (for WinCompose)
+   // (pinky-low)
+   case RGUI_T(KC_SLSH):
 #ifdef VERBOSE_DEBUG
          dprint("MODS tapping term!\n");
 #endif
          return TAPPING_TERM_IN_KEEB_MODS;
 
-   case RGUI_T(KC_M):
+   // right #MAC-GUI (#WIN-ALT)
+   // longer press since `M` (on $DV and $QW) is
+   // used a lot
+   case LGUI_T(KC_M):
      #ifdef VERBOSE_DEBUG
          dprint("MODS tapping term + 50 for M key!\n");
      #endif
