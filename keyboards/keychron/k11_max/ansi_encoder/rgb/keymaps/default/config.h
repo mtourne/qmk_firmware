@@ -2,9 +2,16 @@
 #define CONFIG_H
 
 // Increase "Tap" detection window.
-// this what governs LT() macro and spacebar tap
+// this what governs LT() macro and spacebar tap (300ms works well).
 #undef TAPPING_TERM
-#define TAPPING_TERM 300
+// 200 is the default for QMK
+#define TAPPING_TERM 200
+
+// here we can customize each key
+// see get_tapping_term() isn keymap.c
+// GRV_ESC functionality gets 175ms
+// SPACE FN gets 300ms.
+#define TAPPING_TERM_PER_KEY
 
 // This makes tap and hold keys (like Layer Tap) work better for fast
 // typists, or for high TAPPING_TERM settings.

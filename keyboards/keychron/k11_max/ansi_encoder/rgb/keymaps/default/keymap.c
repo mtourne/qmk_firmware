@@ -107,3 +107,14 @@ tap_dance_action_t tap_dance_actions[] = {
   // tap once for Grave(tilde), Twice for ESC
   [GRV_ESC] = ACTION_TAP_DANCE_DOUBLE(KC_GRV, KC_ESC),
 };
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+	case TD(GRV_ESC):
+	  return 175;
+	case KC_SPC_FN:
+	  return 300;
+	default:
+	  return TAPPING_TERM;
+    }
+}
